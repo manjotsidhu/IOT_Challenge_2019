@@ -847,6 +847,13 @@ if($predc4 != 0) $prediction_days4 /= $predc4;
         // SideNav Initialization
         $(".button-collapse").sideNav();
 
+        var container = document.querySelector('.custom-scrollbar');
+        Ps.initialize(container, {
+            wheelSpeed: 2,
+            wheelPropagation: true,
+            minScrollbarLength: 20
+        });
+
         // Data Picker Initialization
         $('.datepicker').pickadate();
 

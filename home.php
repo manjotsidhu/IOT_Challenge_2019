@@ -333,7 +333,7 @@ if(isset($_POST['logout'])) {
 			
 			
 			<select class="mdb-select md-form colorful-select dropdown-danger" name="sel[]" multiple>
-			  <option value="" disabled selected>Choose your country</option>
+			  <option value="" disabled selected>Choose your options</option>
 			  <option value="vol">Volume and Capacity</option>
 			  <option value="history">History</option>
 			  <option value="pred">Predictions</option>
@@ -366,13 +366,6 @@ if(isset($_POST['logout'])) {
 	
         // SideNav Initialization
         $(".button-collapse").sideNav();
-
-        var container = document.querySelector('.custom-scrollbar');
-        Ps.initialize(container, {
-            wheelSpeed: 2,
-            wheelPropagation: true,
-            minScrollbarLength: 20
-        });
 
         // Data Picker Initialization
         $('.datepicker').pickadate();

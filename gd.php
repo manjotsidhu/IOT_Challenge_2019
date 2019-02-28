@@ -206,23 +206,39 @@ if($predc4 != 0) $prediction_days4 /= $predc4;
     <header>
 
         <!-- Sidebar navigation -->
-        <div id="slide-out" class="fixed sidebar-fixed position-fixed">
+        <div id="slide-out" class="side-nav sn-bg-4 fixed">
+            <ul class="custom-scrollbar">
+            <!-- Logo -->
+            <li class="collapsible-header waves-effect pb-5 pt-2">
+                <div class="text-center">
+                    <a href="#" class="pl-0"><img src="img/slogo.png" class="img" height="100px" width="130px"></a>
+                </div>
+            </li>
+            <!--/. Logo -->
 
-		  <div class="text-center waves-effect pb-4 pt-3">
-			<a href="#" class="pl-0"><img src="img/slogo.png" class="img" height="110px" width="140px"></a>
-		</div>
+            <!-- Side navigation links -->
+            
+			<li>
+			
+				<ul class="collapsible collapsible-accordion">
+                    
+					<li><a href="home.php" class="collapsible-header waves-effect"><i class="fas fa-home"></i> Home</a></li>
 
-		  <div class="list-group list-group-flush">
-			<a href="home.php" class="list-group-item list-group-item-action waves-effect"><i class="fas fa-home mr-3"></i> Home</a>
-			<?php for($d = 1; $d <= $garbage_dumps; $d++) {?>
-			<a href="gd.php?id=<?php echo $d;?>" class="list-group-item list-group-item-action waves-effect <?php if($id==$d) echo "active";?>"><i class="fas fa-bolt mr-3"></i> Garbage Dump <?php echo $d;?></a>
-			<?php }?>
-			<?php if($role == "auth") {?>
-			<a class="list-group-item list-group-item-action waves-effect" data-toggle="modal" href="#set" ><i class="fas fa-cogs mr-3"></i> Settings</a>				
-			<?php } ?>
-		  </div>
-
-		</div>
+					<?php for($d = 1; $d <= $garbage_dumps; $d++) {?>
+                    <li><a href="gd.php?id=<?php echo $d;?>" class="collapsible-header waves-effect <?php if($id==$d) echo "active";?>"><i class="fas fa-bolt"></i> Garbage Dump <?php echo $d;?></a></li>
+					<?php }?>
+					
+					<?php if($role == "auth") {?>
+					<li><a class="collapsible-header waves-effect" data-toggle="modal" href="#set" ><i class="fas fa-cogs"></i> Settings</a></li>				
+					<?php } ?>
+                </ul>
+			
+			</li>
+			
+            <!--/. Side navigation links -->
+            </ul>
+            <div class="sidenav-bg mask-strong"></div>
+        </div>
         <!--/. Sidebar navigation -->
 
         <!-- Navbar -->

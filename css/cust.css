@@ -1,0 +1,46 @@
+.glass {
+    margin: 30px auto;
+    height: 200px;
+    width: 1020px;
+    position: relative;
+    border-style: none solid solid solid;
+    border-width: 10px;
+    border-color: lightgray;
+    border-radius: 10px;
+}
+
+.water1 {
+    width: 100%;
+    height: 0%;
+    background-color: lightgreen;
+    position: absolute;
+    left: 0;
+	bottom: 0;
+}
+
+.water2 {
+    width: 100%;
+    height: 0%;
+    background-color: #f46b42;
+    position: absolute;
+    left: 0;
+	bottom: 0;
+}
+
+.water3 {
+    width: 100%;
+    height: 0%;
+    background-color: #f4f142;
+    position: absolute;
+    left: 0;
+	bottom: 0;
+}
+
+.water4 {
+    width: 100%;
+    height: 0%;
+    background-color: skyblue;
+    position: absolute;
+    left: 0;
+	bottom: 0;
+}

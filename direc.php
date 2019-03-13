@@ -42,7 +42,7 @@ if ($garbage_dumps > 0) {
 }
 
 if(isset($_POST['sel_sub'])) {
-	$as = "INSERT INTO settings (vol,history,pred) VALUES ('0','0','0')";
+	$as = "INSERT INTO settings (vol,history,pred,direc) VALUES ('0','0','0','0')";
 	mysqli_query($conn, $as);
 	
 	foreach ($_POST['sel'] as $selectedOption) {
@@ -62,6 +62,128 @@ if(isset($_POST['logout'])) {
 	header('Location:index.php');
 }
 
+$settings_query = mysqli_query($conn, "SELECT * FROM settings ORDER BY id DESC LIMIT 1");
+$settings_row = mysqli_fetch_assoc($settings_query);
+
+$direc = $settings_row["direc"];
+
+$d=1;
+$gstopc = 0;
+while ($d <= $garbage_dumps) {
+	
+$history_q = mysqli_query($conn, "SELECT * FROM gd$d");
+$history_n = mysqli_num_rows($history_q);
+	
+if ($history_n > 0) {
+	$h = 0;
+	while($row = mysqli_fetch_assoc($history_q)) {
+	$h1[$h] = $row["y1"];
+	$h2[$h] = $row["y2"];
+	$h3[$h] = $row["y3"];
+	$h4[$h] = $row["y4"];
+	$formatted_datetime[$h] = date('Y-m-d H:i:s', strtotime($row["time"]));
+	$formatted_time[$h] = date('g:i a', strtotime($row["time"]));
+	$formatted_date[$h] = date('F j, Y', strtotime($row["time"]));
+	$h++;
+	}
+	
+	$u1c = $h1[$history_n-1]-$h1[$history_n-2];
+	$u2c = $h2[$history_n-1]-$h2[$history_n-2];
+	$u3c = $h3[$history_n-1]-$h3[$history_n-2];
+	$u4c = $h4[$history_n-1]-$h4[$history_n-2];
+}
+
+$initial1 = $formatted_date[0];
+$initial2 = $formatted_date[0];
+$initial3 = $formatted_date[0];
+$initial4 = $formatted_date[0];
+
+$prediction_days1 = 0;
+$prediction_days2 = 0;
+$prediction_days3 = 0;
+$prediction_days4 = 0;
+
+$predc1 = 0;
+$predc2 = 0;
+$predc3 = 0;
+$predc4 = 0;
+
+$last1 = 0;
+$last2 = 0;
+$last3 = 0;
+$last4 = 0;
+
+for ($predn = 0; $predn < $history_n; $predn++) {
+	if($h1[$predn] > 85) {
+		if(!($predn>0)) { 
+			$predc1++;
+			$prediction_days1 += (strtotime($formatted_date[$predn]) - strtotime($initial1))/ 86400;
+			$initial1 = $formatted_date[$predn];
+			$last1 = ($predn < $history_n-1) ? $formatted_date[$predn+1] : $formatted_date[$predn];
+		} else if(!($h1[$predn-1] > 85)) {
+			$predc1++;
+			$prediction_days1 += (strtotime($formatted_date[$predn]) - strtotime($initial1))/ 86400;
+			$initial1 = $formatted_date[$predn];
+			$last1 = ($predn < $history_n-1) ? $formatted_date[$predn+1] : $formatted_date[$predn];
+		}
+	}
+	if($h2[$predn] > 85) {
+		if(!($predn>0)) {
+			$predc2++;
+			$prediction_days2 += (strtotime($formatted_date[$predn]) - strtotime($initial2))/ 86400;
+			$initial2 = $formatted_date[$predn];
+			$last2 = ($predn < $history_n-1) ? $formatted_date[$predn+1] : $formatted_date[$predn];
+		} else if(!($h2[$predn-1] > 85)) {
+			$predc2++;
+			$prediction_days2 += (strtotime($formatted_date[$predn]) - strtotime($initial2))/ 86400;
+			$initial2 = $formatted_date[$predn];
+			$last2 = ($predn < $history_n-1) ? $formatted_date[$predn+1] : $formatted_date[$predn];	
+		}
+	}
+	if($h3[$predn] > 85) {
+		if(!($predn>0)) {
+			$predc3++;
+			$prediction_days3 += (strtotime($formatted_date[$predn]) - strtotime($initial3))/ 86400;
+			$initial3 = $formatted_date[$predn];
+			$last3 = ($predn < $history_n-1) ? $formatted_date[$predn+1] : $formatted_date[$predn];
+		} else if(!($h3[$predn-1] > 85)) {
+			$predc3++;
+			$prediction_days3 += (strtotime($formatted_date[$predn]) - strtotime($initial3))/ 86400;
+			$initial3 = $formatted_date[$predn];
+			$last3 = ($predn < $history_n-1) ? $formatted_date[$predn+1] : $formatted_date[$predn];	
+		}
+		
+	}
+	if($h4[$predn] > 85) {
+		if(!($predn>0)) {
+			$predc4++;
+			$prediction_days4 += (strtotime($formatted_date[$predn]) - strtotime($initial4))/ 86400;
+			$initial4 = $formatted_date[$predn];
+			$last4 = ($predn < $history_n-1) ? $formatted_date[$predn+1] : $formatted_date[$predn];
+		} else if(!($h4[$predn-1] > 85)) {
+			$predc4++;
+			$prediction_days4 += (strtotime($formatted_date[$predn]) - strtotime($initial4))/ 86400;
+			$initial4 = $formatted_date[$predn];
+			$last4 = ($predn < $history_n-1) ? $formatted_date[$predn+1] : $formatted_date[$predn];	
+		}
+
+	}
+}
+
+if($predc1 != 0) $prediction_days1 /= $predc1;
+if($predc2 != 0) $prediction_days2 /= $predc2;
+if($predc3 != 0) $prediction_days3 /= $predc3;
+if($predc4 != 0) $prediction_days4 /= $predc4;
+
+$predavg = strtotime(($prediction_days1 + $prediction_days2 + $prediction_days3 + $prediction_days4)/4);
+$newpred = time();
+if ($predavg-$newpred < 3) {
+	$gstops[$gstopc] = $d;
+	$gstopc++;
+}	
+
+$d++;
+}
 ?>
 <html lang="en">
 <head>
@@ -95,7 +217,8 @@ if(isset($_POST['logout'])) {
 			width:100%;
 			position:absolute;
 			}
-    </style>
+			
+</style>
 </head>
 
 <body class="fixed-sn white-skin">
@@ -105,7 +228,7 @@ if(isset($_POST['logout'])) {
 
         <!-- Sidebar navigation -->
         <div id="slide-out" class="side-nav sn-bg-4 fixed">
-            <ul class="custom-scrollbar">
+			<ul class="custom-scrollbar">
             <!-- Logo -->
             <li class="collapsible-header waves-effect pb-5 pt-2">
                 <div class="text-center">
@@ -118,22 +241,26 @@ if(isset($_POST['logout'])) {
 			
 				<ul class="collapsible collapsible-accordion">
                     
-					<li><a href="index.php" class="collapsible-header waves-effect active"><i class="fas fa-home"></i> Home</a></li>
+					<li><a href="home.php" class="collapsible-header waves-effect"><i class="fas fa-home"></i> Home</a></li>
 
 					<?php for($d = 1; $d <= $garbage_dumps; $d++) {?>
                     <li><a href="gd.php?id=<?php echo $d;?>" class="collapsible-header waves-effect"><i class="fas fa-bolt"></i> Garbage Dump <?php echo $d;?></a></li>
-					<?php }?>
+					<?php } if($direc == 1 || !($role == 'user')) {?>
+					<li><a href="direc.php" class="collapsible-header waves-effect active"><i class="fab fa-google"></i> Directions </a></li>
+					<?php } ?>
 					
 					<?php if($role == "auth") {?>
-					<li><a class="collapsible-header waves-effect" data-toggle="modal" href="#set" ><i class="fas fa-cogs"></i> Settings</a></li>				
+					<li><a class="collapsible-header waves-effect" data-toggle="modal" href="#set" ><i class="fas fa-cogs"></i> Settings</a></li>			
 					
 					<?php } ?>
                 </ul>
 			
 			</li>
+			<!--/. Side navigation links -->
             </ul>
             <div class="sidenav-bg mask-strong"></div>
         </div>
+		
         <!--/. Sidebar navigation -->
 
         <!-- Navbar -->
@@ -142,10 +269,12 @@ if(isset($_POST['logout'])) {
             <div class="float-left">
                 <a href="#" data-activates="slide-out" class="button-collapse black-text"><i class="fa fa-bars"></i></a>
             </div>
+			<!-- Collapse -->
+			
             <!-- Breadcrumb-->
-            <div class="breadcrumb-dn mr-auto">
-                <p>Dashboard - Analysis and Management of Waste
-                    <a class="btn btn-md btn-outline-primary btn-rounded waves-effect"><span class=""><?php echo $garbage_dumps;?> Garbage Dumps</span></a>
+            <div class="breadcrumb-dn mr-auto ml-2">
+                <p> Directions for Garbage Collection
+                    <a class="btn btn-md btn-outline-green waves-effect"><span class=""><?php echo $gstopc;?> Garbage Dump Stops</span></a>
 				</p>
 			</div>
 
@@ -188,128 +317,30 @@ if(isset($_POST['logout'])) {
     <!--Main Navigation-->
 
     <!--Main layout-->
-        <!--Main layout-->
-    <main>
+  <main class=" m-0">
+    <div class="container-fluid m-0 p-0">
 
-        <div class="container-fluid">
-			<?php
-				for($a = 1; $a<=$garbage_dumps;$a++) {
-					$sq = mysqli_query($conn, "SELECT * FROM gd$a ORDER BY id DESC LIMIT 1;");
-					$dn = mysqli_num_rows($sq);
+      <!--Google map-->
+      <div id="map-container" class="map-container" style="height: 500px">
+        <?php
+			$tstring = "";
+			for ($fd = 0; $fd < $gstopc; $fd++) {
+				$tstring .= $dumpsLat[$gstops[$fd]-1];
+				$tstring .= ",";
+				$tstring .= $dumpsLong[$gstops[$fd]-1];
+				if($fd != $gstopc-1) {
+					$tstring .= "|";
+				}
+			}
+			
+		?>
+		<iframe src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDxBPatrzw6Amjm8OpOTwsSTMhaLKbN5jI&origin=IIT+Bombay&destination=IIT+Bombay&waypoints=<?php echo $tstring; ?>&avoid=tolls|highways" frameborder="0" style="border:0"
+          ></iframe>
+      </div>
 
-					if ($dn > 0) {
-						while($row = mysqli_fetch_assoc($sq)) {
-							$u1 = $row["y1"];
-							$u2 = $row["y2"];
-							$u3 = $row["y3"];
-							$u4 = $row["y4"];
-							$time = $row["time"];
-						}
-					}
-			?>
-                    <section>
-            <!--Section: Analytical panel-->
-            <section class="mb-5">
-
-                <!--Card-->
-                <div class="card card-cascade narrower">
-
-                    <!--Section: Chart-->
-					
-
-                        <!--Grid row-->
-                        <div class="row">
-
-                            <!--Grid column-->
-                            <div class="col-xl-5 col-md-12 mr-0">
-
-                                <!--Card image-->
-                                <div class="view view-cascade gradient-card-header primary-color">
-                                    <h4 class="h4-responsive mb-0 font-weight-bold">Garbage Dump <?php echo $a;?></h4>
-                                </div>
-                                <!--/Card image-->
-
-                                <!--Card content-->
-                                <div class="card-body card-body-cascade pb-0">
-
-                                    <!--Panel data-->
-                                    <div class="row card-body pt-3">
-
-                                        <!--First column-->
-                                        <div class="col-md-12">
-
-                                            <div class="progress mb-1 mt-1">
-												<div class="progress-bar warning-color" role="progressbar" style="width: <?php echo $u1;?>%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-											</div>
-											<!--Text-->
-											<p class="grey-text mb-4">Dry Waste : <?php echo $u1;?>%</p>
-
-											<div class="progress mb-1">
-												<div class="progress-bar red accent-2" role="progressbar" style="width: <?php echo $u2;?>%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-											</div>
-											<!--Text-->
-											<p class="grey-text mb-4">Wet Waste : <?php echo $u2;?>%</p>
-
-											<div class="progress mb-1">
-												<div class="progress-bar primary-color" role="progressbar" style="width: <?php echo $u3;?>%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-											</div>
-											<!--Text-->
-											<p class="grey-text mb-4">Mixed Waste : <?php echo $u3;?>%</p>
-
-											<div class="progress mb-1">
-												<div class="progress-bar light-blue lighten-1" role="progressbar" style="width: <?php echo $u4;?>%" aria-valuenow="25" aria-valuemin="0"
-													aria-valuemax="100"></div>
-											</div>
-											<!--Text-->
-											<p class="grey-text mb-2">Medi Waste : <?php echo $u4;?>%</p>
-											<p class="h6 font">Last Updated: <?php echo $time; ?></p>
-										
-											<a href="gd.php?id=<?php echo $a;?>" class="btn peach-gradient float-right">See More</a>
-                                        </div>
-                                        <!--/First column-->
-
-                                    </div>
-                                    <!--/Panel data-->
-
-                                </div>
-                                <!--/.Card content-->
-
-                            </div>
-                            <!--Grid column-->
-
-                            <!--Grid column-->
-                            <div class="col-xl-7 col-md-12 mb-4">
-
-                                <!--Card image-->
-                                <div class="view view-cascade gradient-card-header primary-color">
-
-                                    <div id="map-container-google-1" class="z-depth-1-half map-container" style="height: 300px">
-									  <iframe src="https://maps.google.com/maps?q=<?php echo $dumpsLat[$a-1]; ?>,<?php echo $dumpsLong[$a-1]; ?>&amp;t=&amp;z=10&amp;ie=UTF8&amp;iwloc=&amp;output=embed" frameborder="0" style="border:0" allowfullscreen=""></iframe>
-									</div>
-
-                                </div>
-                                <!--/Card image-->
-
-                            </div>
-                            <!--Grid column-->
-
-                        </div>
-                        <!--Grid row-->
-
-                    </section>
-                    <!--Section: Chart-->
-					
-					
-                </div>
-                <!--/.Card-->
-
-            </section>
-			<?php
-					}
-					?>
-			</div>
-	</main>
-    <!--Main layout-->
+    </div>
+  </main>
+  <!--Main layout-->
 
     <!--Footer
     <footer class="page-footer pt-0 mt-5 rgba-stylish-light">
@@ -345,6 +376,7 @@ if(isset($_POST['logout'])) {
 			  <option value="vol">Volume and Capacity</option>
 			  <option value="history">History</option>
 			  <option value="pred">Predictions</option>
+			  <option value="direc">Directions</option>
 			</select>
 			<label><h6>Select which information users can see</h6></label>
 			<button class="btn-save btn btn-danger btn-sm" type="button">Save</button>
@@ -371,7 +403,6 @@ if(isset($_POST['logout'])) {
     <script type="text/javascript" src="js/mdb.min.js"></script>
     <!--Initializations-->
     <script>
-	
         // SideNav Initialization
         $(".button-collapse").sideNav();
 

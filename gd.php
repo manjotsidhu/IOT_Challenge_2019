@@ -43,7 +43,7 @@ if ($garbage_dumps > 0) {
 }
 
 if(isset($_POST['sel_sub'])) {
-	$as = "INSERT INTO settings (vol,history,pred) VALUES ('0','0','0')";
+	$as = "INSERT INTO settings (vol,history,pred,direc) VALUES ('0','0','0','0')";
 	mysqli_query($conn, $as);
 	
 	foreach ($_POST['sel'] as $selectedOption) {
@@ -64,6 +64,7 @@ $settings_row = mysqli_fetch_assoc($settings_query);
 $vol = $settings_row["vol"];
 $history = $settings_row["history"];
 $pred = $settings_row["pred"];
+$direc = $settings_row["direc"];
 
 if(isset($_POST['logout'])) {
 	session_destroy();
@@ -226,11 +227,16 @@ if($predc4 != 0) $prediction_days4 /= $predc4;
 
 					<?php for($d = 1; $d <= $garbage_dumps; $d++) {?>
                     <li><a href="gd.php?id=<?php echo $d;?>" class="collapsible-header waves-effect <?php if($id==$d) echo "active";?>"><i class="fas fa-bolt"></i> Garbage Dump <?php echo $d;?></a></li>
+					<?php } if($direc == 1 || !($role == 'user')) {?>
+					
+					<li><a href="direc.php" class="collapsible-header waves-effect active"><i class="fab fa-google"></i> Directions </a></li>
 					<?php }?>
+					
 					
 					<?php if($role == "auth") {?>
 					<li><a class="collapsible-header waves-effect" data-toggle="modal" href="#set" ><i class="fas fa-cogs"></i> Settings</a></li>				
 					<?php } ?>
+					
                 </ul>
 			
 			</li>
@@ -823,6 +829,7 @@ if($predc4 != 0) $prediction_days4 /= $predc4;
 			  <option value="vol">Volume and Capacity</option>
 			  <option value="history">History</option>
 			  <option value="pred">Predictions</option>
+			  <option value="direc">Directions</option>
 			</select>
 			<label><h6>Select which information users can see</h6></label>
 			<button class="btn-save btn btn-danger btn-sm" type="button">Save</button>

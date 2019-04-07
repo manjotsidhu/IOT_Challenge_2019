@@ -825,7 +825,7 @@ if($predc4 != 0) $prediction_days4 /= $predc4;
 			
 			
 			<select class="mdb-select md-form colorful-select dropdown-danger" name="sel[]" multiple>
-			  <option value="" disabled selected>Choose your country</option>
+			  <option value="" disabled selected>Choose your options</option>
 			  <option value="vol">Volume and Capacity</option>
 			  <option value="history">History</option>
 			  <option value="pred">Predictions</option>
